@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from "axios";
 import { 
   Upload, 
   CheckCircle, 
@@ -22,6 +23,7 @@ function App() {
   const [companyFileUploaded, setCompanyFileUploaded] = useState(false);
   const [showData, setShowData] = useState(false);
   const [fileName, setFileName] = useState('');
+  const [companyData, setCompanyData] = useState([]);
 
   const complianceData = {
     registration: [
@@ -73,127 +75,32 @@ function App() {
     ]
   };
 
-  const companyData = [
-    {
-        "title": "Company Legal Name",
-        "content": "FirstStaff Workforce Solutions, LLC"
-    },
-    {
-        "title": "Principal Business Address",
-        "content": "3105 Maple Avenue, Suite 1200, Dallas, TX 75201"
-    },
-    {
-        "title": "Phone Number",
-        "content": "(214) 832-4455"
-    },
-    {
-        "title": "Fax Number",
-        "content": "(214) 832-4460"
-    },
-    {
-        "title": "Email Address",
-        "content": "proposals@firststaffsolutions.com"
-    },
-    {
-        "title": "Authorized Representative",
-        "content": "Meredith Chan, Director of Contracts"
-    },
-    {
-        "title": "Authorized Representative Phone",
-        "content": "(212) 555-0199"
-    },
-    {
-        "title": "Signature",
-        "content": "Meredith Chan (signed manually)"
-    },
-    {
-        "title": "Company Length of Existence",
-        "content": "9 years"
-    },
-    {
-        "title": "Years of Experience in Temporary Staffing",
-        "content": "7 years"
-    },
-    {
-        "title": "DUNS Number",
-        "content": "07-842-1490"
-    },
-    {
-        "title": "CAGE Code",
-        "content": "8J4T7"
-    },
-    {
-        "title": "SAM.gov Registration Date",
-        "content": "03/01/2022"
-    },
-    {
-        "title": "NAICS Codes",
-        "content": "561320 – Temporary Help Services; 541611 – Admin Management"
-    },
-    {
-        "title": "State of Incorporation",
-        "content": "Delaware"
-    },
-    {
-        "title": "Bank Letter of Creditworthiness",
-        "content": "Not Available."
-    },
-    {
-        "title": "State Registration Number",
-        "content": "SRN-DE-0923847"
-    },
-    {
-        "title": "Services Provided",
-        "content": "Administrative, IT, Legal & Credentialing Staffing"
-    },
-    {
-        "title": "Business Structure",
-        "content": "Limited Liability Company (LLC)"
-    },
-    {
-        "title": "W-9 Form",
-        "content": "Attached (TIN: 47-6392011)"
-    },
-    {
-        "title": "Certificate of Insurance",
-        "content": "Travelers Insurance, Policy #TX-884529-A; includes Workers' Comp, Liability, and Auto"
-    },
-    {
-        "title": "Licenses",
-        "content": "Texas Employment Agency License #TXEA-34892"
-    },
-    {
-        "title": "Historically Underutilized Business/DBE Status",
-        "content": "Not certified."
-    },
-    {
-        "title": "Key Personnel – Project Manager",
-        "content": "Ramesh Iyer"
-    },
-    {
-        "title": "Key Personnel – Technical Lead",
-        "content": "Sarah Collins"
-    },
-    {
-        "title": "Key Personnel – Security Auditor",
-        "content": "James Wu"
-    },
-    {
-        "title": "MBE Certification",
-        "content": "NO MBE Certification"
-    }
-  ];
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      // Get the filename and set it
       setFileName(e.target.files[0].name);
-      // Mark the file as uploaded and show data
       setCompanyFileUploaded(true);
-      setShowData(true);
-      // No need to actually read the file since we're using predefined data
+  
+      try {
+        const response = await fetch('https://complygen-ai-driven-rfp-compliance.onrender.com/get_company_data');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+  
+        const result = await response.json();
+        const extractedData = result.data?.data || []; // get the nested `data`
+  
+        setCompanyData(extractedData);
+        setShowData(true);
+      } catch (error) {
+        console.error('Error fetching company data:', error);
+        alert('Unable to fetch company data. Please try again later.');
+      }
     }
   };
+  
+  
 
   return (
     <div className="flex flex-col h-screen">
@@ -269,7 +176,7 @@ function App() {
                     <input 
                       id="company-upload"
                       type="file"
-                      accept=".json,.csv,.xlsx,.pdf"
+                      accept=".json,.csv,.xlsx,.pdf, .docx, .doc"
                       className="hidden"
                       onChange={handleFileUpload}
                     />
@@ -291,14 +198,47 @@ function App() {
                 {/* Display company data section */}
                 {showData && (
                   <div className="mt-6 border border-gray-200 rounded-lg p-4">
-                    <h3 className="text-md font-medium text-gray-900 mb-3">Company Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {companyData.map((item, index) => (
-                        <div key={index} className="bg-gray-50 p-3 rounded">
-                          <h4 className="text-sm font-medium text-gray-700">{item.title}</h4>
-                          <p className="text-gray-800 mt-1">{item.content}</p>
-                        </div>
-                      ))}
+                    {showData && (
+  <div className="mt-6 space-y-8">
+    <h3 className="text-xl font-semibold text-gray-800">Company Information</h3>
+
+    {Object.entries(
+      companyData.reduce((groups, item) => {
+        const { category } = item;
+        if (!groups[category]) groups[category] = [];
+        groups[category].push(item);
+        return groups;
+      }, {})
+    ).map(([category, items]) => (
+      <div key={category} className="bg-white shadow rounded-lg p-6 border border-gray-200">
+        <h4 className="text-lg font-medium text-blue-700 mb-4 border-b border-blue-100 pb-2">
+          {category}
+        </h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {items.map((item, index) => (
+            <div
+              key={index}
+              className="flex items-start gap-3 bg-gray-50 border border-gray-100 p-4 rounded-lg shadow-sm"
+            >
+              <span className="mt-1 text-lg">
+                {item.available === "yes" ? (
+                  <span className="text-green-600">✅</span>
+                ) : (
+                  <span className="text-yellow-500">⚠️</span>
+                )}
+              </span>
+              <div>
+                <h5 className="text-sm font-semibold text-gray-800">{item.title}</h5>
+                <p className="text-sm text-gray-700 mt-1">{item.content || "N/A"}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+)}               
                     </div>
                   </div>
                 )}
@@ -361,10 +301,10 @@ function App() {
               </div>
             )}
 
-            {activeTab === 'eligibility' && (
+        {activeTab === 'eligibility' && (
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-lg font-medium text-gray-900">Mandatory Eligibility Criteria</h2>
-                <div className="mt-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {complianceData.eligibility.map((item) => (
                     <div key={item.requirement} className="flex items-center p-4 bg-gray-50 rounded-lg">
                       <div className={`flex-shrink-0 h-5 w-5 ${
