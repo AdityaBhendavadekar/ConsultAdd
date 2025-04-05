@@ -16,8 +16,12 @@ import {
 } from 'lucide-react';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('upload');
-  const [selectedRfp, setSelectedRfp] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('company');
+  const [selectedRfp, setSelectedRfp] = useState(null);
+
+  const [companyFileUploaded, setCompanyFileUploaded] = useState(false);
+  const [showData, setShowData] = useState(false);
+  const [fileName, setFileName] = useState('');
 
   const complianceData = {
     registration: [
@@ -69,10 +73,132 @@ function App() {
     ]
   };
 
+  const companyData = [
+    {
+        "title": "Company Legal Name",
+        "content": "FirstStaff Workforce Solutions, LLC"
+    },
+    {
+        "title": "Principal Business Address",
+        "content": "3105 Maple Avenue, Suite 1200, Dallas, TX 75201"
+    },
+    {
+        "title": "Phone Number",
+        "content": "(214) 832-4455"
+    },
+    {
+        "title": "Fax Number",
+        "content": "(214) 832-4460"
+    },
+    {
+        "title": "Email Address",
+        "content": "proposals@firststaffsolutions.com"
+    },
+    {
+        "title": "Authorized Representative",
+        "content": "Meredith Chan, Director of Contracts"
+    },
+    {
+        "title": "Authorized Representative Phone",
+        "content": "(212) 555-0199"
+    },
+    {
+        "title": "Signature",
+        "content": "Meredith Chan (signed manually)"
+    },
+    {
+        "title": "Company Length of Existence",
+        "content": "9 years"
+    },
+    {
+        "title": "Years of Experience in Temporary Staffing",
+        "content": "7 years"
+    },
+    {
+        "title": "DUNS Number",
+        "content": "07-842-1490"
+    },
+    {
+        "title": "CAGE Code",
+        "content": "8J4T7"
+    },
+    {
+        "title": "SAM.gov Registration Date",
+        "content": "03/01/2022"
+    },
+    {
+        "title": "NAICS Codes",
+        "content": "561320 – Temporary Help Services; 541611 – Admin Management"
+    },
+    {
+        "title": "State of Incorporation",
+        "content": "Delaware"
+    },
+    {
+        "title": "Bank Letter of Creditworthiness",
+        "content": "Not Available."
+    },
+    {
+        "title": "State Registration Number",
+        "content": "SRN-DE-0923847"
+    },
+    {
+        "title": "Services Provided",
+        "content": "Administrative, IT, Legal & Credentialing Staffing"
+    },
+    {
+        "title": "Business Structure",
+        "content": "Limited Liability Company (LLC)"
+    },
+    {
+        "title": "W-9 Form",
+        "content": "Attached (TIN: 47-6392011)"
+    },
+    {
+        "title": "Certificate of Insurance",
+        "content": "Travelers Insurance, Policy #TX-884529-A; includes Workers' Comp, Liability, and Auto"
+    },
+    {
+        "title": "Licenses",
+        "content": "Texas Employment Agency License #TXEA-34892"
+    },
+    {
+        "title": "Historically Underutilized Business/DBE Status",
+        "content": "Not certified."
+    },
+    {
+        "title": "Key Personnel – Project Manager",
+        "content": "Ramesh Iyer"
+    },
+    {
+        "title": "Key Personnel – Technical Lead",
+        "content": "Sarah Collins"
+    },
+    {
+        "title": "Key Personnel – Security Auditor",
+        "content": "James Wu"
+    },
+    {
+        "title": "MBE Certification",
+        "content": "NO MBE Certification"
+    }
+  ];
+
+  const handleFileUpload = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      // Get the filename and set it
+      setFileName(e.target.files[0].name);
+      // Mark the file as uploaded and show data
+      setCompanyFileUploaded(true);
+      setShowData(true);
+      // No need to actually read the file since we're using predefined data
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex flex-col h-screen">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm flex-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -92,39 +218,93 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-12 gap-6">
-          {/* Sidebar */}
-          <div className="col-span-3">
-            <nav className="space-y-1">
-              {[
-                { id: 'upload', icon: Upload, label: 'Upload RFP' },
-                { id: 'compliance', icon: Shield, label: 'Compliance Checks' },
-                { id: 'eligibility', icon: FileCheck, label: 'Eligibility Criteria' },
-                { id: 'checklist', icon: Clock, label: 'Submission Checklist' },
-                { id: 'risks', icon: AlertCircle, label: 'Risk Analysis' }
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
-                    activeTab === item.id
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  <item.icon className="h-5 w-5 mr-3" />
-                  {item.label}
-                  <ChevronRight className={`ml-auto h-4 w-4 ${
-                    activeTab === item.id ? 'text-blue-700' : 'text-gray-400'
-                  }`} />
-                </button>
-              ))}
-            </nav>
-          </div>
+      <div className="flex flex-1 overflow-hidden bg-gray-50">
+        {/* Sidebar - Fixed, no scroll */}
+        <div className="w-1/4 max-w-xs bg-white shadow-md p-4 flex-none">
+          <nav className="space-y-1">
+            {[
+              { id: 'company', icon: Building, label: 'Upload Company Data' },
+              { id: 'upload', icon: Upload, label: 'Upload RFP' },
+              { id: 'compliance', icon: Shield, label: 'Compliance Checks' },
+              { id: 'eligibility', icon: FileCheck, label: 'Eligibility Criteria' },
+              { id: 'checklist', icon: Clock, label: 'Submission Checklist' },
+              { id: 'risks', icon: AlertCircle, label: 'Risk Analysis' }
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
+                  activeTab === item.id
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <item.icon className="h-5 w-5 mr-3" />
+                {item.label}
+                <ChevronRight className={`ml-auto h-4 w-4 ${
+                  activeTab === item.id ? 'text-blue-700' : 'text-gray-400'
+                }`} />
+              </button>
+            ))}
+          </nav>
+        </div>
 
-          {/* Main Content Area */}
-          <div className="col-span-9">
+        {/* Content Area - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-4xl mx-auto">
+            {activeTab === 'company' && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-lg font-medium text-gray-900 mb-4">Upload Company Data</h2>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
+                  <Building className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-gray-900">
+                      Upload your company's information file
+                    </p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Supported format: CSV, XLSX, JSON
+                    </p>
+                  </div>
+                  <div className="mt-4">
+                    <input 
+                      id="company-upload"
+                      type="file"
+                      accept=".json,.csv,.xlsx,.pdf"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                    />
+                    <label 
+                      htmlFor="company-upload" 
+                      className="inline-block cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      Choose File
+                    </label>
+                    {fileName && <p className="mt-2 text-sm text-gray-600">Selected: {fileName}</p>}
+                  </div>
+                  {companyFileUploaded && (
+                    <div className="mt-4 px-4 py-2 bg-green-100 text-green-800 rounded">
+                      ✅ File uploaded successfully!
+                    </div>
+                  )}
+                </div>
+                
+                {/* Display company data section */}
+                {showData && (
+                  <div className="mt-6 border border-gray-200 rounded-lg p-4">
+                    <h3 className="text-md font-medium text-gray-900 mb-3">Company Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {companyData.map((item, index) => (
+                        <div key={index} className="bg-gray-50 p-3 rounded">
+                          <h4 className="text-sm font-medium text-gray-700">{item.title}</h4>
+                          <p className="text-gray-800 mt-1">{item.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {activeTab === 'upload' && (
               <div className="bg-white rounded-lg shadow p-6">
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
@@ -137,12 +317,23 @@ function App() {
                       or click to browse (PDF, DOC, DOCX up to 50MB)
                     </p>
                   </div>
-                  <button 
-                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    onClick={() => setSelectedRfp('RFP-2024-001.pdf')}
+                  <input 
+                    id="rfp-upload"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) {
+                        setSelectedRfp(e.target.files[0].name);
+                      }
+                    }}
+                  />
+                  <label 
+                    htmlFor="rfp-upload" 
+                    className="mt-4 inline-block cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                   >
                     Upload Document
-                  </button>
+                  </label>
                 </div>
               </div>
             )}
@@ -246,7 +437,7 @@ function App() {
             )}
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
