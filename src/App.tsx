@@ -198,7 +198,7 @@ function App() {
                 {/* Display company data section */}
                 {showData && (
                   <div className="mt-6 border border-gray-200 rounded-lg p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                     {showData && (
   <div className="mt-6 space-y-8">
     <h3 className="text-xl font-semibold text-gray-800">Company Information</h3>
@@ -215,7 +215,7 @@ function App() {
         <h4 className="text-lg font-medium text-blue-700 mb-4 border-b border-blue-100 pb-2">
           {category}
         </h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 grid-cols-2 gap-6">
           {items.map((item, index) => (
             <div
               key={index}
