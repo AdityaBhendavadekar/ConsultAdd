@@ -380,109 +380,113 @@ useEffect(() => {
   
 
   return (
-    <div className="flex flex-col h-screen">
-      {/* Header */}
-      <header className="bg-white shadow-sm flex-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <FileText className="h-8 w-8 text-blue-600" />
-              <h1 className="ml-2 text-2xl font-bold text-gray-900">RFP Analyzer</h1>
-            </div>
-            {selectedRfp && (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-500">Analyzing: {selectedRfp}</span>
-                <button className="p-2 rounded-full hover:bg-gray-100">
-                  <Settings className="h-6 w-6 text-gray-600" />
-                </button>
-              </div>
-            )}
-          </div>
+    <div className="flex flex-col h-screen bg-gray-50">
+  {/* Header */}
+  <header className="bg-white shadow-sm z-10">
+    <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="flex items-center space-x-3">
+        <FileText className="h-8 w-8 text-blue-600" />
+        <h1 className="text-2xl font-semibold text-gray-800">RFP Analyzer</h1>
+      </div>
+
+      {selectedRfp && (
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-gray-500">Analyzing: {selectedRfp}</span>
+          <button className="p-2 rounded-full hover:bg-gray-100 transition">
+            <Settings className="h-6 w-6 text-gray-600" />
+          </button>
         </div>
-      </header>
+      )}
+    </div>
+  </header>
 
-      {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden bg-gray-50">
-  {/* Sidebar - Fixed, no scroll */}
-  <div className="w-1/4 max-w-xs bg-white shadow-md p-4 flex-none">
-    <nav className="space-y-1">
-      {[
-        { id: 'company', icon: Building, label: 'Company Data' },
-        { id: 'upload', icon: Upload, label: 'Upload RFP' }
-      ].map((item) => (
-        <button
-          key={item.id}
-          onClick={() => setActiveTab(item.id)}
-          className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
-            activeTab === item.id
-              ? 'bg-blue-50 text-blue-700'
-              : 'text-gray-600 hover:bg-gray-50'
-          }`}
-        >
-          <item.icon className="h-5 w-5 mr-3" />
-          {item.label}
-        </button>
-      ))}
-
-      {/* Dashboard with submenu */}
-      <div>
-        <div className="flex items-center justify-between">
+  {/* Main */}
+  <div className="flex flex-1 overflow-hidden">
+    {/* Sidebar */}
+    <aside className="w-64 bg-white shadow-md p-5 border-r border-gray-200">
+      <nav className="space-y-4">
+        {[{ id: 'company', icon: Building, label: 'Company Data' },
+          { id: 'upload', icon: Upload, label: 'Upload RFP' }
+        ].map(item => (
           <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`flex-grow flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
-              activeTab === 'dashboard'
-                ? 'bg-blue-50 text-blue-700'
-                : 'text-gray-600 hover:bg-gray-50'
+            key={item.id}
+            onClick={() => setActiveTab(item.id)}
+            className={`w-full flex items-center px-4 py-2 text-sm font-medium rounded-lg transition ${
+              activeTab === item.id
+                ? 'bg-blue-100 text-blue-700'
+                : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
-            <CheckCircle className="h-5 w-5 mr-3" />
-            Dashboard
+            <item.icon className="h-5 w-5 mr-3" />
+            {item.label}
           </button>
-          <button
-            onClick={() => setShowDashboardSubmenu((prev) => !prev)}
-            className="px-2 py-3 text-gray-500 hover:text-blue-600"
-          >
-            <ChevronRight
-              className={`h-4 w-4 transform transition-transform ${
-                showDashboardSubmenu ? 'rotate-90 text-blue-700' : 'text-gray-400'
+        ))}
+
+        {/* Dashboard section */}
+        <div>
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`flex-grow flex items-center px-4 py-2 text-sm font-medium rounded-lg transition ${
+                activeTab === 'dashboard'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-700 hover:bg-gray-100'
               }`}
-            />
-          </button>
-        </div>
-
-        {showDashboardSubmenu && (
-          <div className="ml-8 mt-1 space-y-1">
-            {[
-              // { id: 'compliance', icon: Shield, label: 'Compliance Checks' },
-              { id: 'preference', icon: Shield, label: 'Preference' },
-              { id: 'forms', icon: Shield, label: 'Forms and Attachments' },
-              { id: 'format', icon: Shield, label: 'Proposal Format' },
-              { id: 'evaluation', icon: Shield, label: 'Evaluation' },
-              { id: 'payment', icon: Shield, label: 'Payment Crieteria' },
-              { id: 'submission', icon: Shield, label: 'Submission Type' },
-              { id: 'eligibility', icon: FileCheck, label: 'Eligibility Criteria' },
-              { id: 'checklist', icon: Clock, label: 'Submission Checklist' },
-              { id: 'risks', icon: AlertCircle, label: 'Risk Analysis' }
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center px-3 py-2 text-sm rounded-md ${
-                  activeTab === item.id
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-100'
+            >
+              <CheckCircle className="h-5 w-5 mr-3" />
+              Dashboard
+            </button>
+            <button
+              onClick={() => setShowDashboardSubmenu(prev => !prev)}
+              className="px-2 py-2 text-gray-500 hover:text-blue-600 transition"
+            >
+              <ChevronRight
+                className={`h-4 w-4 transform transition-transform ${
+                  showDashboardSubmenu ? 'rotate-90 text-blue-600' : 'text-gray-400'
                 }`}
-              >
-                <item.icon className="h-4 w-4 mr-2" />
-                {item.label}
-              </button>
-            ))}
+              />
+            </button>
           </div>
-        )}
-      </div>
-    </nav>
-  </div>
 
+          {/* Dashboard submenu */}
+          {showDashboardSubmenu && (
+            <div className="ml-4 mt-2 space-y-1 border-l border-gray-200 pl-4">
+              {[
+                { id: 'preference', icon: Shield, label: 'Preference' },
+                { id: 'forms', icon: Shield, label: 'Forms & Attachments' },
+                { id: 'format', icon: Shield, label: 'Proposal Format' },
+                { id: 'evaluation', icon: Shield, label: 'Evaluation' },
+                { id: 'payment', icon: Shield, label: 'Payment Criteria' },
+                { id: 'submission', icon: Shield, label: 'Submission Type' },
+                { id: 'eligibility', icon: FileCheck, label: 'Eligibility Criteria' },
+                { id: 'checklist', icon: Clock, label: 'Submission Checklist' },
+                { id: 'risks', icon: AlertCircle, label: 'Risk Analysis' }
+              ].map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full flex items-center px-3 py-2 text-sm rounded-md transition ${
+                    activeTab === item.id
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <item.icon className="h-4 w-4 mr-2" />
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </nav>
+    </aside>
+
+    {/* Content area (you can add your main content here) */}
+    {/* <main className="flex-1 p-6 overflow-auto"> */}
+      {/* Place content based on `activeTab` */}
+    {/* </main> */}
+  {/* </div> */}
+{/* </div> */}
 
         {/* Content Area - Scrollable */}
         <div className="flex-1 overflow-y-auto p-6">
