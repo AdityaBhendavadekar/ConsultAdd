@@ -37,6 +37,149 @@ function App() {
 const [loading, setLoading] = useState(false);
 const [uploadProgress, setUploadProgress] = useState(0);
 
+const [complianceList, setComplianceList] = useState([]);
+
+useEffect(() => {
+  const fetchComplianceData = async () => {
+    try {
+      const response = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/compliance_check');
+      setComplianceList(response.data.data); // 👈 fix: access the actual array inside "data"
+    } catch (error) {
+      console.error('Error fetching compliance data:', error);
+    }
+  };
+
+  fetchComplianceData();
+}, []);
+
+
+
+const [preferenceData, setPreferenceData] = useState([]);
+
+useEffect(() => {
+  const fetchPreferenceData = async () => {
+    try {
+      const response = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/preference');
+      setPreferenceData(response.data.data); // API returns { data: [...] }
+    } catch (error) {
+      console.error('Error fetching preference data:', error);
+    }
+  };
+
+  fetchPreferenceData();
+}, []);
+
+
+
+const [formsData, setFormsData] = useState([]);
+
+useEffect(() => {
+  const fetchFormsData = async () => {
+    try {
+      const response = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/forms_attachments');
+      setFormsData(response.data.data); // "data" is an array
+    } catch (error) {
+      console.error('Error fetching forms data:', error);
+    }
+  };
+
+  fetchFormsData();
+}, []);
+
+
+const [formatData, setFormatData] = useState([]);
+
+useEffect(() => {
+  const fetchFormatData = async () => {
+    try {
+      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/format_of_document');
+      setFormatData(res.data.data); // ensure `data` is extracted properly
+    } catch (error) {
+      console.error('Error fetching format data:', error);
+    }
+  };
+
+  fetchFormatData();
+}, []);
+
+
+const [evaluationData, setEvaluationData] = useState([]);
+
+useEffect(() => {
+  const fetchEvaluationData = async () => {
+    try {
+      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/evaluation_criteria');
+      setEvaluationData(res.data.data);
+    } catch (error) {
+      console.error('Error fetching evaluation criteria:', error);
+    }
+  };
+
+  fetchEvaluationData();
+}, []);
+
+
+const [eligibilityResult, setEligibilityResult] = useState(null);
+
+useEffect(() => {
+  const fetchEligibility = async () => {
+    try {
+      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/analyzed_rfp');
+      setEligibilityResult(res.data.data);
+    } catch (error) {
+      console.error('Error fetching eligibility result:', error);
+    }
+  };
+
+  fetchEligibility();
+}, []);
+
+
+const [paymentData, setPaymentData] = useState([]);
+
+useEffect(() => {
+  const fetchPaymentData = async () => {
+    try {
+      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/payment_criteria');
+      setPaymentData(res.data.data);
+    } catch (error) {
+      console.error('Failed to fetch payment criteria:', error);
+    }
+  };
+
+  fetchPaymentData();
+}, []);
+
+
+const [submissionData, setSubmissionData] = useState([]);
+
+useEffect(() => {
+  const fetchSubmissionData = async () => {
+    try {
+      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/submission');
+      setSubmissionData(res.data.data);
+    } catch (error) {
+      console.error('Failed to fetch submission data:', error);
+    }
+  };
+
+  fetchSubmissionData();
+}, []);
+
+const [riskData, setRiskData] = useState([]);
+
+useEffect(() => {
+  const fetchRiskData = async () => {
+    try {
+      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/risk_analysis');
+      setRiskData(res.data.data);
+    } catch (error) {
+      console.error('Failed to fetch risk data:', error);
+    }
+  };
+
+  fetchRiskData();
+}, []);
 
 
   // useEffect(() => {
@@ -475,8 +618,9 @@ const [uploadProgress, setUploadProgress] = useState(0);
       className="mt-6 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
       disabled={loading}
     >
-      {loading ? 'Generating...' : 'Generate'}
+      {loading ? 'Analysis in progress...' : 'Analyze'}
     </button>
+
 
     {loading && (
       <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
@@ -495,18 +639,39 @@ const [uploadProgress, setUploadProgress] = useState(0);
 
 {/* Dashboard Dummy */}
 {activeTab === 'dashboard' && (
-  <div className="bg-gradient-to-br from-blue-50 via-white to-blue-100 rounded-2xl shadow-xl p-10 space-y-10">
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+    className="bg-gradient-to-br from-blue-50 via-white to-blue-100 rounded-2xl shadow-xl p-10 space-y-10"
+  >
     <h2 className="text-3xl font-bold text-blue-900 flex items-center gap-2">
       📊 RFP Progress Overview
       <span className="text-sm bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-medium">
         Live Preview
       </span>
-    </h2>    
+    </h2>
 
-    {/* Individual Checks Section */}
+    {eligibilityResult && (
+    <div
+      className={`text-center text-xl font-bold px-4 py-3 rounded-lg mb-6 shadow-md ${
+        eligibilityResult.eligible === 'yes'
+          ? 'bg-green-100 text-green-800 border border-green-300'
+          : 'bg-red-100 text-red-800 border border-red-300'
+      }`}
+    >
+      {eligibilityResult.eligible === 'yes'
+        ? '✅ Eligible for Submission'
+        : '❌ Not Eligible for Submission'}
+      <p className="text-sm font-normal mt-1 text-gray-700">
+        Reason: {eligibilityResult.reason}
+      </p>
+    </div>
+  )}
+
     <div>
       <h3 className="text-2xl font-semibold text-blue-800 mb-6">✅ Individual Checks</h3>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {(() => {
           const totalCount = criteriaData.reduce((sum, item) => sum + item.len, 0) || 1;
@@ -529,14 +694,15 @@ const [uploadProgress, setUploadProgress] = useState(0);
             const mapped = categoryMap[item.category] || { id: 'default', icon: '📁', label: item.category };
 
             return (
-              <div
+              <motion.div
                 key={index}
-                onClick={() => {
-                    setActiveTab(mapped.id);          // set which tab to show
-                    // navigate('/dashboard');           
-                }}
-                
-                className="bg-white/80 backdrop-blur-sm border border-blue-100 p-6 rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out"
+                onClick={() => setActiveTab(mapped.id)}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-white/80 backdrop-blur-sm border border-blue-100 p-6 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 ease-in-out cursor-pointer"
               >
                 <div className="flex flex-col items-center justify-center space-y-3">
                   <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl shadow-inner">
@@ -546,196 +712,268 @@ const [uploadProgress, setUploadProgress] = useState(0);
                   <p className="text-sm text-gray-600">{status}</p>
                   <p className="text-xs text-gray-500">Findings: {item.len}</p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                    <motion.div
+                      className="bg-blue-500 h-2 rounded-full"
                       style={{ width: `${width}%` }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${width}%` }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
                     />
                   </div>
                   <p className="text-[10px] text-gray-400 mt-1">{item.len} of {totalCount}</p>
                 </div>
-              </div>
+              </motion.div>
             );
           });
         })()}
       </div>
     </div>
-  </div>
+  </motion.div>
+)}
+
+
+
+{activeTab === 'submission' && (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    className="bg-white rounded-lg shadow divide-y"
+  >
+    <div className="p-6">
+      <h2 className="text-lg font-medium text-gray-900">📤 Submission Requirements</h2>
+
+      <div className="mt-6 space-y-4">
+        {submissionData.map((item, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+            className="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-blue-700 font-semibold text-md">{item.title}</p>
+                <p className="text-sm text-gray-600 mt-1">{item.content}</p>
+              </div>
+              <span className="text-xs text-gray-500">📄 Page {item.page_no}</span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  </motion.div>
+)}
+
+
+{activeTab === 'payment' && (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    className="bg-white rounded-lg shadow divide-y"
+  >
+    <div className="p-6">
+      <h2 className="text-lg font-medium text-gray-900">📄 Payment Criteria</h2>
+
+      <div className="mt-6 space-y-4">
+        {paymentData.map((item, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+            className="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-blue-700 font-semibold text-md">{item.title}</p>
+                <p className="text-sm text-gray-600 mt-1">{item.content}</p>
+              </div>
+              <span className="text-xs text-gray-500">📄 Page {item.page_no}</span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  </motion.div>
+)}
+
+
+{activeTab === 'evaluation' && (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    className="bg-white rounded-lg shadow divide-y"
+  >
+    <div className="p-6">
+      <h2 className="text-lg font-medium text-gray-900">Evaluation Criteria</h2>
+
+      <div className="mt-6 space-y-4">
+        {Array.isArray(evaluationData) && evaluationData.length > 0 ? (
+          evaluationData.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200"
+            >
+              <h3 className="text-md font-semibold text-gray-800">{item.title}</h3>
+              <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{item.content}</p>
+              <div className="text-xs text-gray-500 mt-2 flex justify-between">
+                <span>📂 Category: {item.category}</span>
+                <span>📄 Page: {item.page_no}</span>
+              </div>
+            </motion.div>
+          ))
+        ) : (
+          <p className="text-gray-500">Loading evaluation details...</p>
+        )}
+      </div>
+    </div>
+  </motion.div>
+)}
+
+{activeTab === 'format' && (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    className="bg-white rounded-lg shadow divide-y"
+  >
+    <div className="p-6">
+      <h2 className="text-lg font-medium text-gray-900">Document Format Guidelines</h2>
+
+      <div className="mt-6 space-y-4">
+        {Array.isArray(formatData) && formatData.length > 0 ? (
+          formatData.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200"
+            >
+              <h3 className="text-md font-semibold text-gray-800">{item.title}</h3>
+              <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{item.content}</p>
+              <div className="text-xs text-gray-500 mt-2 flex justify-between">
+                <span>📂 Category: {item.category}</span>
+                <span>📄 Page: {item.page_no}</span>
+              </div>
+            </motion.div>
+          ))
+        ) : (
+          <p className="text-gray-500">Loading document format details...</p>
+        )}
+      </div>
+    </div>
+  </motion.div>
+)}
+
+{activeTab === 'forms' && (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    className="bg-white rounded-lg shadow divide-y"
+  >
+    <div className="p-6">
+      <h2 className="text-lg font-medium text-gray-900">Forms & Attachments</h2>
+
+      <div className="mt-6 space-y-4">
+        {Array.isArray(formsData) && formsData.length > 0 ? (
+          formsData.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200"
+            >
+              <h3 className="text-md font-semibold text-gray-800">{item.title}</h3>
+              <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{item.content}</p>
+              <div className="text-xs text-gray-500 mt-2 flex justify-between">
+                <span>📂 Category: {item.category}</span>
+                <span>📄 Page: {item.page_no}</span>
+              </div>
+            </motion.div>
+          ))
+        ) : (
+          <p className="text-gray-500">Loading forms and attachments...</p>
+        )}
+      </div>
+    </div>
+  </motion.div>
+)}
+
+
+{activeTab === 'preference' && (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    className="bg-white rounded-lg shadow divide-y"
+  >
+    <div className="p-6">
+      <h2 className="text-lg font-medium text-gray-900">Preference Clauses</h2>
+
+      <div className="mt-6 space-y-4">
+        {Array.isArray(preferenceData) && preferenceData.length > 0 ? (
+          preferenceData.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200"
+            >
+              <h3 className="text-md font-semibold text-gray-800">{item.title}</h3>
+              <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{item.content}</p>
+              <div className="text-xs text-gray-500 mt-2 flex justify-between">
+                <span>🏷️ Category: {item.category}</span>
+                <span>📄 Page: {item.page_no}</span>
+              </div>
+            </motion.div>
+          ))
+        ) : (
+          <p className="text-gray-500">Loading preference clauses...</p>
+        )}
+      </div>
+    </div>
+  </motion.div>
 )}
 
 
 
 
-{activeTab === 'submission' && (
-              <div className="bg-white rounded-lg shadow divide-y">
-                
-                <div className="p-6">
-                  <h2 className="text-lg font-medium text-gray-900">Standard Compliance Checks</h2>
-                  <div className="mt-6 grid grid-cols-1 gap-4">
-                    {complianceData.registration.map((item) => (
-                      <div key={item.label} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{item.label}</p>
-                          <p className="text-sm text-gray-500">{item.message}</p>
-                        </div>
-                        <div className={`h-3 w-3 rounded-full ${
-                          item.status === 'valid' ? 'bg-green-500' :
-                          item.status === 'warning' ? 'bg-yellow-500' :
-                          'bg-red-500'
-                        }`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
+{activeTab === 'compliance' && (
+  <div className="bg-white rounded-lg shadow divide-y">
+    <div className="p-6">
+      <h2 className="text-lg font-medium text-gray-900">Standard Compliance Checks</h2>
+
+      <div className="mt-6 space-y-4">
+        {Array.isArray(complianceList) && complianceList.length > 0 ? (
+          complianceList.map((item, index) => (
+            <div key={index} className="p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200">
+              <h3 className="text-md font-semibold text-gray-800">{item.title}</h3>
+              <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{item.content}</p>
+              <div className="text-xs text-gray-500 mt-2 flex justify-between">
+                <span>📘 Category: {item.category}</span>
+                <span>📄 Page: {item.page_no}</span>
               </div>
-            )}
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500">Loading compliance checks...</p>
+        )}
+      </div>
+    </div>
+  </div>
+)} 
 
-{activeTab === 'payment' && (
-              <div className="bg-white rounded-lg shadow divide-y">
-                
-                <div className="p-6">
-                  <h2 className="text-lg font-medium text-gray-900">Standard Compliance Checks</h2>
-                  <div className="mt-6 grid grid-cols-1 gap-4">
-                    {complianceData.registration.map((item) => (
-                      <div key={item.label} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{item.label}</p>
-                          <p className="text-sm text-gray-500">{item.message}</p>
-                        </div>
-                        <div className={`h-3 w-3 rounded-full ${
-                          item.status === 'valid' ? 'bg-green-500' :
-                          item.status === 'warning' ? 'bg-yellow-500' :
-                          'bg-red-500'
-                        }`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}  
-
-
-{activeTab === 'evaluation' && (
-              <div className="bg-white rounded-lg shadow divide-y">
-                
-                <div className="p-6">
-                  <h2 className="text-lg font-medium text-gray-900">Standard Compliance Checks</h2>
-                  <div className="mt-6 grid grid-cols-1 gap-4">
-                    {complianceData.registration.map((item) => (
-                      <div key={item.label} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{item.label}</p>
-                          <p className="text-sm text-gray-500">{item.message}</p>
-                        </div>
-                        <div className={`h-3 w-3 rounded-full ${
-                          item.status === 'valid' ? 'bg-green-500' :
-                          item.status === 'warning' ? 'bg-yellow-500' :
-                          'bg-red-500'
-                        }`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-{activeTab === 'format' && (
-              <div className="bg-white rounded-lg shadow divide-y">
-                
-                <div className="p-6">
-                  <h2 className="text-lg font-medium text-gray-900">Standard Compliance Checks</h2>
-                  <div className="mt-6 grid grid-cols-1 gap-4">
-                    {complianceData.registration.map((item) => (
-                      <div key={item.label} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{item.label}</p>
-                          <p className="text-sm text-gray-500">{item.message}</p>
-                        </div>
-                        <div className={`h-3 w-3 rounded-full ${
-                          item.status === 'valid' ? 'bg-green-500' :
-                          item.status === 'warning' ? 'bg-yellow-500' :
-                          'bg-red-500'
-                        }`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-{activeTab === 'forms' && (
-              <div className="bg-white rounded-lg shadow divide-y">
-                
-                <div className="p-6">
-                  <h2 className="text-lg font-medium text-gray-900">Standard Compliance Checks</h2>
-                  <div className="mt-6 grid grid-cols-1 gap-4">
-                    {complianceData.registration.map((item) => (
-                      <div key={item.label} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{item.label}</p>
-                          <p className="text-sm text-gray-500">{item.message}</p>
-                        </div>
-                        <div className={`h-3 w-3 rounded-full ${
-                          item.status === 'valid' ? 'bg-green-500' :
-                          item.status === 'warning' ? 'bg-yellow-500' :
-                          'bg-red-500'
-                        }`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-
-{activeTab === 'preference' && (
-              <div className="bg-white rounded-lg shadow divide-y">
-                
-                <div className="p-6">
-                  <h2 className="text-lg font-medium text-gray-900">Standard Compliance Checks</h2>
-                  <div className="mt-6 grid grid-cols-1 gap-4">
-                    {complianceData.registration.map((item) => (
-                      <div key={item.label} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{item.label}</p>
-                          <p className="text-sm text-gray-500">{item.message}</p>
-                        </div>
-                        <div className={`h-3 w-3 rounded-full ${
-                          item.status === 'valid' ? 'bg-green-500' :
-                          item.status === 'warning' ? 'bg-yellow-500' :
-                          'bg-red-500'
-                        }`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-
-
-            {activeTab === 'compliance' && (
-              <div className="bg-white rounded-lg shadow divide-y">
-                
-                <div className="p-6">
-                  <h2 className="text-lg font-medium text-gray-900">Standard Compliance Checks</h2>
-                  <div className="mt-6 grid grid-cols-1 gap-4">
-                    {complianceData.registration.map((item) => (
-                      <div key={item.label} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{item.label}</p>
-                          <p className="text-sm text-gray-500">{item.message}</p>
-                        </div>
-                        <div className={`h-3 w-3 rounded-full ${
-                          item.status === 'valid' ? 'bg-green-500' :
-                          item.status === 'warning' ? 'bg-yellow-500' :
-                          'bg-red-500'
-                        }`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
 
         {activeTab === 'eligibility' && (
               <div className="bg-white rounded-lg shadow p-6">
@@ -786,31 +1024,57 @@ const [uploadProgress, setUploadProgress] = useState(0);
               </div>
             )}
 
-            {activeTab === 'risks' && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-medium text-gray-900">Contract Risk Analysis</h2>
-                <div className="mt-6 space-y-4">
-                  {complianceData.risks.map((item) => (
-                    <div key={item.category} className="p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-gray-900">{item.category}</h3>
-                        <span className={`px-2 py-1 text-xs font-medium rounded ${
-                          item.risk === 'High' ? 'bg-red-100 text-red-800' :
-                          item.risk === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
-                        }`}>
-                          {item.risk} Risk
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">{item.description}</p>
-                      <p className="text-sm font-medium text-blue-600">
-                        Suggestion: {item.suggestion}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+{activeTab === 'risks' && (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+    className="bg-white rounded-xl shadow p-6"
+  >
+    <h2 className="text-2xl font-semibold text-red-700 flex items-center gap-2">
+      ⚠️ Contract Risk Analysis
+    </h2>
+    <p className="text-sm text-gray-600 mt-1">Potential threats identified from the contract with impact assessment & suggestions.</p>
+
+    <div className="mt-6 space-y-6">
+      {riskData.map((item, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          className="border border-red-200 bg-red-50 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                🚩 {item.title}
+              </h3>
+              <span className="text-sm text-gray-500">📄 Page {item.page_no}</span>
+            </div>
+
+            <span className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm uppercase ${
+              item.severity === 'high' ? 'bg-red-600 text-white' :
+              item.severity === 'medium' ? 'bg-yellow-400 text-black' :
+              'bg-green-500 text-white'
+            }`}>
+              {item.severity} Risk
+            </span>
+          </div>
+
+          <p className="text-gray-700 text-sm mb-3">
+            {item.description}
+          </p>
+
+          <div className="bg-white border-l-4 border-blue-500 p-3 rounded text-sm text-blue-700 shadow-sm">
+            💡 <span className="font-medium">Suggestion:</span> {item.suggestion}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </motion.div>
+)}
+
           </div>
         </div>
       </div>
