@@ -464,15 +464,16 @@ const [riskData, setRiskData] = useState([]);
           {showDashboardSubmenu && (
             <div className="ml-4 mt-2 pl-2 border-l-2 border-blue-100 space-y-1">
               {[
+                { id: 'compliance', icon: Shield, label: 'Complaince Check' },
                 { id: 'preference', icon: Shield, label: 'Preference' },
                 { id: 'forms', icon: Shield, label: 'Forms & Attachments' },
                 { id: 'format', icon: Shield, label: 'Proposal Format' },
                 { id: 'evaluation', icon: Shield, label: 'Evaluation' },
                 { id: 'payment', icon: Shield, label: 'Payment Criteria' },
-                { id: 'submission', icon: Shield, label: 'Submission Type' },
-                { id: 'eligibility', icon: FileCheck, label: 'Eligibility Criteria' },
-                { id: 'checklist', icon: Clock, label: 'Submission Checklist' },
-                { id: 'risks', icon: AlertCircle, label: 'Risk Analysis' }
+                { id: 'submission', icon: Shield, label: 'Submission Checklist' },
+                { id: 'risks', icon: Shield, label: 'Risk Analysis' }
+                // { id: 'eligibility', icon: FileCheck, label: 'Eligibility Criteria' },
+                // { id: 'checklist', icon: Clock, label: 'Submission Checklist' },
               ].map((item) => (
                 <button
                   key={item.id}
