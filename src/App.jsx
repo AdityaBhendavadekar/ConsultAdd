@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-// import Dash from './components/Dash'
 
 import { 
   Upload, 
@@ -24,7 +23,7 @@ import { data } from 'framer-motion/client';
 function App() {
   const [activeTab, setActiveTab] = useState('company');
   const [selectedRfp, setSelectedRfp] = useState(null);
-  const [complianceData1, setComplianceData] = useState(null); // response data
+  const [complianceData1, setComplianceData] = useState(null);
 
   const [companyFileUploaded, setCompanyFileUploaded] = useState(false);
   const [showData, setShowData] = useState(false);
@@ -32,162 +31,62 @@ function App() {
   const [companyData, setCompanyData] = useState([]);
 
   const [criteriaData, setCriteriaData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
-// const [selectedRfp, setSelectedRfp] = useState(null);
-const [loading, setLoading] = useState(false);
-const [uploadProgress, setUploadProgress] = useState(0);
-
-const [complianceList, setComplianceList] = useState([]);
-
-useEffect(() => {
-  const fetchComplianceData = async () => {
-    try {
-      const response = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/compliance_check');
-      setComplianceList(response.data.data); // 👈 fix: access the actual array inside "data"
-    } catch (error) {
-      console.error('Error fetching compliance data:', error);
-    }
-  };
-
-  fetchComplianceData();
-}, []);
-
-
-
-const [preferenceData, setPreferenceData] = useState([]);
-
-useEffect(() => {
-  const fetchPreferenceData = async () => {
-    try {
-      const response = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/preference');
-      setPreferenceData(response.data.data); // API returns { data: [...] }
-    } catch (error) {
-      console.error('Error fetching preference data:', error);
-    }
-  };
-
-  fetchPreferenceData();
-}, []);
-
-
-
-const [formsData, setFormsData] = useState([]);
-
-useEffect(() => {
-  const fetchFormsData = async () => {
-    try {
-      const response = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/forms_attachments');
-      setFormsData(response.data.data); // "data" is an array
-    } catch (error) {
-      console.error('Error fetching forms data:', error);
-    }
-  };
-
-  fetchFormsData();
-}, []);
-
-
-const [formatData, setFormatData] = useState([]);
-
-useEffect(() => {
-  const fetchFormatData = async () => {
-    try {
-      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/format_of_document');
-      setFormatData(res.data.data); // ensure `data` is extracted properly
-    } catch (error) {
-      console.error('Error fetching format data:', error);
-    }
-  };
-
-  fetchFormatData();
-}, []);
-
-
-const [evaluationData, setEvaluationData] = useState([]);
-
-useEffect(() => {
-  const fetchEvaluationData = async () => {
-    try {
-      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/evaluation_criteria');
-      setEvaluationData(res.data.data);
-    } catch (error) {
-      console.error('Error fetching evaluation criteria:', error);
-    }
-  };
-
-  fetchEvaluationData();
-}, []);
-
-
-const [eligibilityResult, setEligibilityResult] = useState(null);
-
-useEffect(() => {
-  const fetchEligibility = async () => {
-    try {
-      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/analyzed_rfp');
-      setEligibilityResult(res.data.data);
-    } catch (error) {
-      console.error('Error fetching eligibility result:', error);
-    }
-  };
-
-  fetchEligibility();
-}, []);
-
-
-const [paymentData, setPaymentData] = useState([]);
-
-useEffect(() => {
-  const fetchPaymentData = async () => {
-    try {
-      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/payment_criteria');
-      setPaymentData(res.data.data);
-    } catch (error) {
-      console.error('Failed to fetch payment criteria:', error);
-    }
-  };
-
-  fetchPaymentData();
-}, []);
-
-
-const [submissionData, setSubmissionData] = useState([]);
-
-useEffect(() => {
-  const fetchSubmissionData = async () => {
-    try {
-      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/submission');
-      setSubmissionData(res.data.data);
-    } catch (error) {
-      console.error('Failed to fetch submission data:', error);
-    }
-  };
-
-  fetchSubmissionData();
-}, []);
-
-const [riskData, setRiskData] = useState([]);
+  const [complianceList, setComplianceList] = useState([]);
+  const [preferenceData, setPreferenceData] = useState([]);
+  const [formsData, setFormsData] = useState([]);
+  const [formatData, setFormatData] = useState([]);
+  const [evaluationData, setEvaluationData] = useState([]);
+  const [eligibilityResult, setEligibilityResult] = useState(null);
+  const [paymentData, setPaymentData] = useState([]);
+  const [submissionData, setSubmissionData] = useState([]);
+  const [riskData, setRiskData] = useState([]);
 
   useEffect(() => {
-    const fetchRiskData = async () => {
+    const fetchAllData = async () => {
       try {
-        const response = await fetch('https://complygen-ai-driven-rfp-compliance.onrender.com/risk_analysis');
-        const result = await response.json();
-        setRiskData(result.data);
+        const [
+          complianceRes,
+          preferenceRes,
+          formsRes,
+          formatRes,
+          evaluationRes,
+          eligibilityRes,
+          paymentRes,
+          submissionRes,
+          riskRes
+        ] = await Promise.all([
+          axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/compliance_check'),
+          axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/preference'),
+          axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/forms_attachments'),
+          axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/format_of_document'),
+          axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/evaluation_criteria'),
+          axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/analyzed_rfp'),
+          axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/payment_criteria'),
+          axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/submission'),
+          fetch('https://complygen-ai-driven-rfp-compliance.onrender.com/risk_analysis') // native fetch here
+        ]);
+
+        setComplianceList(complianceRes.data.data);
+        setPreferenceData(preferenceRes.data.data);
+        setFormsData(formsRes.data.data);
+        setFormatData(formatRes.data.data);
+        setEvaluationData(evaluationRes.data.data);
+        setEligibilityResult(eligibilityRes.data.data);
+        setPaymentData(paymentRes.data.data);
+        setSubmissionData(submissionRes.data.data);
+
+        const riskJson = await riskRes.json();
+        setRiskData(riskJson.data);
       } catch (error) {
-        console.error('Error fetching risk analysis data:', error);
+        console.error('Error fetching one or more data:', error);
       }
     };
 
-    fetchRiskData();
+    fetchAllData();
   }, []);
-
-
-  // useEffect(() => {
-  //   if (companyFileUploaded) {
-  //     alert('✅ File uploaded successfully!');
-  //   }
-  // }, [companyFileUploaded]);
 
   const navigate = useNavigate();
 
