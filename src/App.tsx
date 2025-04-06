@@ -166,6 +166,22 @@ useEffect(() => {
   fetchSubmissionData();
 }, []);
 
+const [riskData, setRiskData] = useState([]);
+
+  useEffect(() => {
+    const fetchRiskData = async () => {
+      try {
+        const response = await fetch('https://complygen-ai-driven-rfp-compliance.onrender.com/risk_analysis');
+        const result = await response.json();
+        setRiskData(result.data);
+      } catch (error) {
+        console.error('Error fetching risk analysis data:', error);
+      }
+    };
+
+    fetchRiskData();
+  }, []);
+
 
   // useEffect(() => {
   //   if (companyFileUploaded) {
