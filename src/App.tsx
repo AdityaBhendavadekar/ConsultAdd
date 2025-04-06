@@ -166,21 +166,6 @@ useEffect(() => {
   fetchSubmissionData();
 }, []);
 
-const [riskData, setRiskData] = useState([]);
-
-useEffect(() => {
-  const fetchRiskData = async () => {
-    try {
-      const res = await axios.get('https://complygen-ai-driven-rfp-compliance.onrender.com/risk_analysis');
-      setRiskData(res.data.data);
-    } catch (error) {
-      console.error('Failed to fetch risk data:', error);
-    }
-  };
-
-  fetchRiskData();
-}, []);
-
 
   // useEffect(() => {
   //   if (companyFileUploaded) {
@@ -380,77 +365,88 @@ useEffect(() => {
   
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-white">
   {/* Header */}
-  <header className="bg-white shadow-sm z-10">
-    <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <div className="flex items-center space-x-3">
-        <FileText className="h-8 w-8 text-blue-600" />
-        <h1 className="text-2xl font-semibold text-gray-800">RFP Analyzer</h1>
-      </div>
-
-      {selectedRfp && (
-        <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-500">Analyzing: {selectedRfp}</span>
-          <button className="p-2 rounded-full hover:bg-gray-100 transition">
-            <Settings className="h-6 w-6 text-gray-600" />
-          </button>
+  <header className="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg backdrop-blur-md bg-opacity-90 flex-none">
+    <div className="max-w-7xl px-6 py-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <FileText className="h-8 w-8 text-white drop-shadow-sm" />
+          <h1 className="text-2xl font-bold text-white tracking-wider drop-shadow-sm">
+            RFP Analyzer
+          </h1>
         </div>
-      )}
+        {selectedRfp && (
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-blue-100 font-medium bg-white/10 px-3 py-1 rounded-full shadow-inner backdrop-blur-sm">
+              📄 Analyzing: <span className="underline">{selectedRfp}</span>
+            </span>
+            <button className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition">
+              <Settings className="h-6 w-6 text-white" />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   </header>
 
-  {/* Main */}
+  {/* Main Content */}
   <div className="flex flex-1 overflow-hidden">
     {/* Sidebar */}
-    <aside className="w-64 bg-white shadow-md p-5 border-r border-gray-200">
-      <nav className="space-y-4">
-        {[{ id: 'company', icon: Building, label: 'Company Data' },
-          { id: 'upload', icon: Upload, label: 'Upload RFP' }
-        ].map(item => (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center px-4 py-2 text-sm font-medium rounded-lg transition ${
-              activeTab === item.id
-                ? 'bg-blue-100 text-blue-700'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <item.icon className="h-5 w-5 mr-3" />
-            {item.label}
-          </button>
-        ))}
+    <div className="w-1/4 max-w-xs bg-white/60 backdrop-blur-lg border-r border-blue-100 rounded-tr-3xl shadow-inner p-5 flex-none overflow-y-auto">
+      <nav className="space-y-4 text-gray-800">
+        {/* Section: Primary */}
+        <div className="space-y-2">
+          {[
+            { id: 'company', icon: Building, label: 'Company Data' },
+            { id: 'upload', icon: Upload, label: 'Upload RFP' }
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition duration-200 shadow-sm ${
+                activeTab === item.id
+                  ? 'bg-gradient-to-r from-blue-200 to-blue-100 text-blue-800'
+                  : 'hover:bg-gray-100 text-gray-700'
+              }`}
+            >
+              <item.icon className="h-5 w-5 mr-3" />
+              {item.label}
+            </button>
+          ))}
+        </div>
 
-        {/* Dashboard section */}
-        <div>
+        <hr className="border-t border-gray-200 my-3" />
+
+        {/* Section: Dashboard */}
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`flex-grow flex items-center px-4 py-2 text-sm font-medium rounded-lg transition ${
+              className={`flex-grow flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition duration-200 shadow-sm ${
                 activeTab === 'dashboard'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'bg-gradient-to-r from-blue-200 to-blue-100 text-blue-800'
+                  : 'hover:bg-gray-100 text-gray-700'
               }`}
             >
               <CheckCircle className="h-5 w-5 mr-3" />
               Dashboard
             </button>
             <button
-              onClick={() => setShowDashboardSubmenu(prev => !prev)}
-              className="px-2 py-2 text-gray-500 hover:text-blue-600 transition"
+              onClick={() => setShowDashboardSubmenu((prev) => !prev)}
+              className="px-2 text-gray-500 hover:text-blue-600 transition"
             >
               <ChevronRight
-                className={`h-4 w-4 transform transition-transform ${
-                  showDashboardSubmenu ? 'rotate-90 text-blue-600' : 'text-gray-400'
+                className={`h-4 w-4 transform transition-transform duration-300 ${
+                  showDashboardSubmenu ? 'rotate-90 text-blue-700' : 'text-gray-400'
                 }`}
               />
             </button>
           </div>
 
-          {/* Dashboard submenu */}
+          {/* Dashboard Submenu */}
           {showDashboardSubmenu && (
-            <div className="ml-4 mt-2 space-y-1 border-l border-gray-200 pl-4">
+            <div className="ml-4 mt-2 pl-2 border-l-2 border-blue-100 space-y-1">
               {[
                 { id: 'preference', icon: Shield, label: 'Preference' },
                 { id: 'forms', icon: Shield, label: 'Forms & Attachments' },
@@ -461,14 +457,14 @@ useEffect(() => {
                 { id: 'eligibility', icon: FileCheck, label: 'Eligibility Criteria' },
                 { id: 'checklist', icon: Clock, label: 'Submission Checklist' },
                 { id: 'risks', icon: AlertCircle, label: 'Risk Analysis' }
-              ].map(item => (
+              ].map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center px-3 py-2 text-sm rounded-md transition ${
+                  className={`w-full flex items-center px-3 py-2 text-sm rounded-md transition duration-200 ${
                     activeTab === item.id
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      ? 'bg-blue-100 text-blue-700 font-semibold'
+                      : 'hover:bg-gray-100 text-gray-700'
                   }`}
                 >
                   <item.icon className="h-4 w-4 mr-2" />
@@ -479,165 +475,164 @@ useEffect(() => {
           )}
         </div>
       </nav>
-    </aside>
+    </div>
 
-    {/* Content area (you can add your main content here) */}
-    {/* <main className="flex-1 p-6 overflow-auto"> */}
-      {/* Place content based on `activeTab` */}
-    {/* </main> */}
+    {/* Rest of the content goes here */}
   {/* </div> */}
 {/* </div> */}
 
+
+
         {/* Content Area - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-4xl mx-auto">
-          {activeTab === 'company' && (
-            
-  <div className="bg-white rounded-lg shadow p-6">
-    {/* Header with Button */}
-    <div className="flex items-center justify-between mb-4">
-      <h2 className="text-lg font-medium text-gray-900">Upload Company Data</h2>
-      <label
-        htmlFor="company-upload"
-        className="inline-block cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-      >
-        Choose File
-      </label>
-    </div>
+<div className="flex-1 overflow-y-auto relative">
+  {/* Vibrant Gradient Background */}
+  <div className="absolute inset-0 bg-gradient-to-br from-[#e0f7fa] via-[#fce4ec] to-[#ede7f6] opacity-90 z-0" />
 
-    {/* Hidden Input for File Upload */}
-    <input
-      id="company-upload"
-      type="file"
-      accept=".json,.csv,.xlsx,.pdf,.docx,.doc"
-      className="hidden"
-      onChange={handleFileUpload}
-    />
+  {/* Animated Floating Blobs */}
+  <div className="absolute top-[-150px] left-[-150px] w-[300px] h-[300px] bg-pink-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
+  <div className="absolute bottom-[-150px] right-[-150px] w-[300px] h-[300px] bg-purple-400 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
 
-{showData && (
-  <motion.div
-    className="mt-6 border border-gray-200 rounded-lg p-4"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6, ease: 'easeOut' }}
-  >
-    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-      <div className="mt-6 space-y-8">
-        <motion.h3
-          className="text-xl font-semibold text-gray-800"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          Company Information
-        </motion.h3>
+  {/* Scrollable Content */}
+  <div className="relative z-10 p-8">
+    <div className="max-w-5xl mx-auto space-y-8">
 
-        {Object.entries(
-          companyData.reduce((groups, item) => {
-            const { category } = item;
-            if (!groups[category]) groups[category] = [];
-            groups[category].push(item);
-            return groups;
-          }, {})
-        ).map(([category, items], i) => (
-          <motion.div
-            key={category}
-            className="bg-white shadow rounded-lg p-6 border border-gray-200"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + i * 0.1 }}
-          >
-            <h4 className="text-lg font-medium text-blue-700 mb-4 border-b border-blue-100 pb-2">
-              {category}
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {items.map((item, index) => (
+      {/* Company Upload Panel */}
+      {activeTab === 'company' && (
+        <div className="bg-white/70 backdrop-blur-md rounded-3xl border border-pink-200 shadow-lg p-6 transition hover:shadow-2xl">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">📁 Upload Company Data</h2>
+            <label
+              htmlFor="company-upload"
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg shadow-md hover:scale-105 transition transform cursor-pointer"
+            >
+              Choose File
+            </label>
+          </div>
+
+          <input
+            id="company-upload"
+            type="file"
+            accept=".json,.csv,.xlsx,.pdf,.docx,.doc"
+            className="hidden"
+            onChange={handleFileUpload}
+          />
+
+          {showData && (
+            <motion.div
+              className="mt-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.h3
+                className="text-xl font-semibold text-gray-900 mb-6 border-b border-gray-300 pb-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                Company Information
+              </motion.h3>
+
+              {Object.entries(
+                companyData.reduce((groups, item) => {
+                  const { category } = item;
+                  if (!groups[category]) groups[category] = [];
+                  groups[category].push(item);
+                  return groups;
+                }, {})
+              ).map(([category, items], i) => (
                 <motion.div
-                  key={index}
-                  className="flex items-start gap-3 bg-gray-50 border border-gray-100 p-4 rounded-lg shadow-sm"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5 + index * 0.05 }}
+                  key={category}
+                  className="bg-white/80 backdrop-blur-sm border-l-4 border-purple-400 shadow-md rounded-xl p-6 mb-6 transform transition hover:scale-[1.01]"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + i * 0.1 }}
                 >
-                  <span className="mt-1 text-lg">
-                    {item.available === "yes" ? (
-                      <span className="text-green-600">✅</span>
-                    ) : (
-                      <span className="text-yellow-500">⚠️</span>
-                    )}
-                  </span>
-                  <div>
-                    <h5 className="text-sm font-semibold text-gray-800">{item.title}</h5>
-                    <p className="text-sm text-gray-700 mt-1">{item.content || "N/A"}</p>
+                  <h4 className="text-lg font-bold text-purple-600 mb-4">{category}</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {items.map((item, index) => (
+                      <motion.div
+                        key={index}
+                        className="flex gap-3 p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg shadow-sm hover:shadow-md border border-gray-200"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.5 + index * 0.05 }}
+                      >
+                        <div className="mt-1 text-lg">
+                          {item.available === "yes" ? (
+                            <span className="text-green-500">✅</span>
+                          ) : (
+                            <span className="text-yellow-500">⚠️</span>
+                          )}
+                        </div>
+                        <div>
+                          <h5 className="text-md font-semibold text-gray-800">{item.title}</h5>
+                          <p className="text-sm text-gray-700">{item.content || "N/A"}</p>
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
                 </motion.div>
               ))}
-            </div>
-          </motion.div>
-        ))}
-      </div>
+            </motion.div>
+          )}
+        </div>
+      )}
+
+      {/* RFP Upload Section */}
+      {activeTab === 'upload' && (
+        <div className="bg-white/70 backdrop-blur-md rounded-3xl border border-indigo-200 shadow-lg p-6 transition hover:shadow-2xl">
+          <div className="border-2 border-dashed border-gray-400 rounded-xl p-12 text-center bg-white/60">
+            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+            <p className="mt-4 text-md font-medium text-gray-800">
+              Drop your RFP document here
+            </p>
+            <p className="text-sm text-gray-500">or click to browse (PDF, DOC, DOCX)</p>
+
+            <input
+              id="rfp-upload"
+              type="file"
+              accept=".pdf,.doc,.docx"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  setSelectedRfp(e.target.files[0].name);
+                }
+              }}
+            />
+            <label
+              htmlFor="rfp-upload"
+              className="mt-4 inline-block px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 cursor-pointer transition"
+            >
+              Upload Document
+            </label>
+          </div>
+
+          {selectedRfp && (
+            <>
+              <button
+                onClick={() => handleGenerate(selectedRfp)}
+                className="mt-6 px-4 py-2 bg-green-500 text-white rounded-md hover:scale-105 transition"
+                disabled={loading}
+              >
+                {loading ? 'Analyzing...' : 'Analyze'}
+              </button>
+
+              {loading && (
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
+                  <div
+                    className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
-  </motion.div>
-)}
-
-  </div>
-)}
-
-{activeTab === 'upload' && (
-  <div className="bg-white rounded-lg shadow p-6">
-    <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
-      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-      <div className="mt-4">
-        <p className="text-sm font-medium text-gray-900">
-          Drop your RFP document here
-        </p>
-        <p className="mt-1 text-sm text-gray-500">
-          or click to browse (PDF, DOC, DOCX up to 50MB)
-        </p>
-      </div>
-      <input 
-        id="rfp-upload"
-        type="file"
-        accept=".pdf,.doc,.docx"
-        className="hidden"
-        onChange={(e) => {
-          if (e.target.files && e.target.files.length > 0) {
-            setSelectedRfp(e.target.files[0].name);
-          }
-        }}
-      />
-      <label 
-        htmlFor="rfp-upload" 
-        className="mt-4 inline-block cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-      >
-        Upload Document
-      </label>
-      </div>
-      
-      {/* Conditionally show Generate button */}
-      {selectedRfp && (
-  <>
-    <button
-      onClick={() => handleGenerate(selectedRfp)}
-      className="mt-6 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
-      disabled={loading}
-    >
-      {loading ? 'Analysis in progress...' : 'Analyze'}
-    </button>
-
-
-    {loading && (
-      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-        <div
-          className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-          style={{ width: `${uploadProgress}%` }}
-        ></div>
-      </div>
-    )}
-  </>
-)}
-  </div>
-)}
+  {/* </div> */}
+{/* </div> */}
 
 
 
@@ -1028,7 +1023,7 @@ useEffect(() => {
               </div>
             )}
 
-{activeTab === 'risks' && (
+            {activeTab === 'risks' && (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
