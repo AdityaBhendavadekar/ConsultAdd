@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 
 import { 
   Upload, 
@@ -87,8 +86,6 @@ function App() {
 
     fetchAllData();
   }, []);
-
-  const navigate = useNavigate();
 
 
   const categoryMap = {
